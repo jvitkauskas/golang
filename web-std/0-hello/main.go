@@ -9,7 +9,7 @@ func main() {
 	mux := http.NewServeMux()
 
 	// Handle root path with optional name query parameter
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("GET /{$}", func(w http.ResponseWriter, r *http.Request) {
 		name := r.URL.Query().Get("name")
 		if name == "" {
 			name = "World"
@@ -18,9 +18,15 @@ func main() {
 	})
 
 	// Handle name parameter in the path
-	mux.HandleFunc("/{name}", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("GET /{name}", func(w http.ResponseWriter, r *http.Request) {
 		name := r.PathValue("name")
 		fmt.Fprintf(w, "Hello %s", name)
+	})
+
+	// Fallback for routes not matched by previous rules
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Fprintf(w, "Not Found")
 	})
 
 	port := "8080"
